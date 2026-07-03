@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: crime_db
+    environment:
+      POSTGRES_DB: crime_ai
+      POSTGRES_USER: crime
+      POSTGRES_PASSWORD: crime
+    ports:
+      - "5432:5432"
+    volumes:
+      - crime_db_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: crime_api
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: crime_dashboard
+    environment:
+      - DASH_PORT=8050
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - api
+    ports:
+      - "8050:8050"
+
+volumes:
+  crime_db_data:
+
