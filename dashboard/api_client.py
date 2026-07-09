@@ -19,9 +19,11 @@ def fetch_crimes(api_base: str = "http://127.0.0.1:8000", **params) -> list[dict
         return []
 
 
-def fetch_predictions(api_base: str = "http://127.0.0.1:8000", city: str = "BUCARAMANGA", target_date: str | None = None, limit: int = 10) -> list[dict[str, Any]]:
+def fetch_predictions(api_base: str = "http://127.0.0.1:8000", city: str | None = None, target_date: str | None = None, limit: int = 10) -> list[dict[str, Any]]:
     url = f"{api_base.rstrip('/')}/api/v1/predictions"
-    params: dict[str, Any] = {"city": city, "limit": limit}
+    params: dict[str, Any] = {"limit": limit}
+    if city:
+        params["city"] = city
     if target_date:
         params["target_date"] = target_date
     try:

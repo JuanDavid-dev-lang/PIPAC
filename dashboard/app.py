@@ -45,6 +45,7 @@ CITY_NAV = [
 
 def load_initial_dataframe() -> pd.DataFrame:
     candidates = [
+        PROJECT_ROOT / "datasets" / "processed" / "crime_hurtos_nacional_featured.parquet",
         PROJECT_ROOT / "datasets" / "processed" / "crime_hurtos_nacional.parquet",
         PROJECT_ROOT / "datasets" / "processed" / "crime_bga.parquet",
         PROJECT_ROOT / "datasets" / "processed" / "crime_bga_featured.parquet",
@@ -65,11 +66,12 @@ def load_initial_dataframe() -> pd.DataFrame:
 
     return pd.DataFrame(
         {
-            "barrio": ["CABECERA", "LA CONCORDIA", "CENTRO", "GIRON", "MORRORICO", "PENTAGONO"],
-            "comuna": ["BUCARAMANGA", "BUCARAMANGA", "BUCARAMANGA", "GIRÓN", "BUCARAMANGA", "FLORIDABLANCA"],
+            "barrio": ["CENTRO", "CHAPINERO", "BOSA", "EL POBLADO", "SANTA ROSA", "SAN JOSÉ"],
+            "comuna": ["BOGOTÁ D.C.", "BOGOTÁ D.C.", "BOGOTÁ D.C.", "MEDELLÍN", "CARTAGENA", "BOGOTÁ D.C."],
             "tipo_delito": ["HURTO A PERSONAS", "HURTO A RESIDENCIAS", "LESIONES PERSONALES", "HURTO A PERSONAS", "HURTO A PERSONAS", "LESIONES PERSONALES"],
-            "lat": [7.1193, 7.1178, 7.1184, 7.0708, 7.1161, 7.0722],
-            "lon": [-73.1227, -73.1059, -73.1191, -73.1740, -73.1220, -73.0870],
+            "departamento": ["BOGOTÁ D.C.", "BOGOTÁ D.C.", "BOGOTÁ D.C.", "ANTIOQUIA", "BOLÍVAR", "BOGOTÁ D.C."],
+            "lat": [4.6097, 4.6533, 4.6240, 6.2442, 10.3910, 4.5981],
+            "lon": [-74.0817, -74.0608, -74.1440, -75.5812, -75.4794, -74.0687],
             "densidad_eventos_30d": [144.0, 112.0, 98.0, 76.0, 61.0, 54.0],
             "tasa_crimen_1000": [8.8, 7.5, 6.4, 5.1, 4.2, 3.8],
             "es_riesgo_alto": [1, 1, 1, 1, 0, 0],
@@ -266,7 +268,7 @@ sidebar = html.Aside(
                 html.Div(
                     children=[
                         html.Div("PIPAC", className="pipac-brand-title"),
-                        html.Div("Bucaramanga Smart City", className="pipac-brand-subtitle"),
+                        html.Div("Plataforma Nacional de Seguridad", className="pipac-brand-subtitle"),
                     ]
                 ),
             ],
@@ -450,7 +452,7 @@ config_panel = html.Section(
             html.Div(
                 className="pipac-config-cards",
                 children=[
-                    html.Div(className="pipac-mini-info-card", children=[html.Div("Ciudad por defecto", className="pipac-mini-title"), html.Div("BUCARAMANGA", className="pipac-mini-copy")]),
+                    html.Div(className="pipac-mini-info-card", children=[html.Div("Cobertura por defecto", className="pipac-mini-title"), html.Div("COLOMBIA", className="pipac-mini-copy")]),
                     html.Div(className="pipac-mini-info-card", children=[html.Div("Actualización", className="pipac-mini-title"), html.Div("Tiempo real con refresco del reloj superior.", className="pipac-mini-copy")]),
                     html.Div(className="pipac-mini-info-card", children=[html.Div("Modo visual", className="pipac-mini-title"), html.Div("Tema oscuro premium para salas de control.", className="pipac-mini-copy")]),
                 ],
@@ -486,8 +488,8 @@ app.layout = html.Div(
                         html.Div(
                             children=[
                                 html.Div(className="pipac-topbar-eyebrow", children="PIPAC - Plataforma de Predicción y Análisis de Criminalidad"),
-                                html.H1("Inteligencia de datos para una ciudad más segura", className="pipac-topbar-title"),
-                                html.Div(className="pipac-topbar-copy", children="Dashboard gubernamental orientado a ciudadanos y entidades, con lectura geoespacial priorizada y visual premium."),
+                                html.H1("Inteligencia de datos para todo Colombia", className="pipac-topbar-title"),
+                                html.Div(className="pipac-topbar-copy", children="Dashboard gubernamental orientado a ciudadanía y entidades, con lectura geoespacial nacional y visual premium."),
                             ]
                         ),
                         header_buttons,
@@ -806,7 +808,7 @@ def update_dashboard(ciudad_val, delito_val, barrio_val, riesgo_val, hora_val, e
     ]
 
     try:
-        city_for_predictions = ciudad_val or (filtered_df[city_column].iloc[0] if not filtered_df.empty and city_column in filtered_df.columns else "BUCARAMANGA")
+        city_for_predictions = ciudad_val or (filtered_df[city_column].iloc[0] if not filtered_df.empty and city_column in filtered_df.columns else "COLOMBIA")
         preds = fetch_predictions(city=city_for_predictions)
     except Exception:
         preds = []

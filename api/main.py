@@ -10,7 +10,12 @@ from api.routes.predictions import router as predictions_router
 from api.routes.stats import router as stats_router
 from api.routes.alerts import router as alerts_router
 from api.routes.admin import router as admin_router
+from api.routes.territorios import router as territorios_router
+from api.routes.entidades import router as entidades_router
+from api.routes.buscador import router as buscador_router
+from api.routes.denuncias import router as denuncias_router
 from preprocessing.etl import run_default_etl
+
 
 app = FastAPI(
     title="Plataforma Inteligente para la Prediccion y Analisis de Criminalidad",
@@ -26,14 +31,19 @@ app.include_router(predictions_router)
 app.include_router(stats_router)
 app.include_router(alerts_router)
 app.include_router(admin_router)
+app.include_router(territorios_router)
+app.include_router(entidades_router)
+app.include_router(buscador_router)
+app.include_router(denuncias_router)
+
 
 
 @app.get("/meta")
 def meta():
     return {
         "project_root": str(PROJECT_ROOT),
-        "city": settings.default_city,
-        "note": "Conecta datos.gov.co, ETL, PostGIS, FastAPI y Dash.",
+        "scope": settings.default_city,
+        "note": "Conecta datos.gov.co, ETL nacional, PostGIS, FastAPI y Dash.",
     }
 
 

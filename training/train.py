@@ -143,7 +143,10 @@ def main():
         from training.hotspots import detect_hotspots_dbscan
         db_model, db_df = detect_hotspots_dbscan(featured_df, eps_km=1.5 if is_nacional else 0.5, min_samples=10)
         joblib.dump(db_model, output_dir / "dbscan_hotspots.joblib")
-        db_df.to_parquet(project_root / "datasets" / "processed" / "crime_bga_featured.parquet", index=False)
+        national_featured_path = project_root / "datasets" / "processed" / "crime_hurtos_nacional_featured.parquet"
+        legacy_featured_path = project_root / "datasets" / "processed" / "crime_bga_featured.parquet"
+        db_df.to_parquet(national_featured_path, index=False)
+        db_df.to_parquet(legacy_featured_path, index=False)
         print("Entrenamiento completado de forma exitosa.")
     else:
         print("Error: No se encontró ningún dataset procesado de criminalidad.")

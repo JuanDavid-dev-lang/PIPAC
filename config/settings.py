@@ -11,7 +11,7 @@ class Settings:
     database_url: str = os.getenv("DATABASE_URL", "postgresql+psycopg2://crime:crime@localhost:5432/crime_ai")
     socrata_app_token: str | None = os.getenv("SOCRATA_APP_TOKEN") or None
     socrata_base_url: str = os.getenv("SOCRATA_BASE_URL", "https://www.datos.gov.co/resource")
-    default_city: str = os.getenv("DEFAULT_CITY", "BUCARAMANGA")
+    default_city: str = os.getenv("DEFAULT_CITY", "COLOMBIA")
     timezone: str = os.getenv("TIMEZONE", "America/Bogota")
 
 
@@ -21,7 +21,7 @@ settings = Settings()
 DATASETS = {
     "crime_bga": {
         "id": "x46e-abhz",
-        "name": "Informacion delictiva del municipio de Bucaramanga",
+        "name": "Informacion delictiva municipal histórica",
         "source": "https://www.datos.gov.co/Seguridad-y-Defensa/Informaci-n-delictiva-del-municipio-de-Bucaramanga/x46e-abhz",
         "refresh": "quarterly",
     },
@@ -33,13 +33,13 @@ DATASETS = {
     },
     "poblacion_bga": {
         "id": "kn95-8dei",
-        "name": "Datos de proyeccion de poblacion de Bucaramanga desagregados por barrios y comunas",
+        "name": "Datos de proyeccion de poblacion municipal desagregados por barrios y comunas",
         "source": "https://www.datos.gov.co/Vivienda-Ciudad-y-Territorio/Datos-de-proyecci-n-de-poblaci-n-de-Bucaramanga-de/kn95-8dei",
         "refresh": "annual",
     },
     "accidentes_bga": {
         "id": "7cci-nqqb",
-        "name": "Accidentes de Transito ocurridos en el Municipio de Bucaramanga",
+        "name": "Accidentes de Transito ocurridos en el municipio",
         "source": "https://www.datos.gov.co/Transporte/3-Accidentes-de-Transito-ocurridos-en-el-Municipio/7cci-nqqb",
         "refresh": "annual",
     },

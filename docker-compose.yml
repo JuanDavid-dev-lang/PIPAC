@@ -39,6 +39,18 @@ services:
     ports:
       - "8050:8050"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pipac_frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
 volumes:
   crime_db_data:
 

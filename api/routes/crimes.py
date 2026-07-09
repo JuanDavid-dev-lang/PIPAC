@@ -8,6 +8,15 @@ router = APIRouter(prefix="/api/v1/crimes", tags=["crimes"])
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
+def _resolve_dataset_path(city: str | None) -> Path:
+    national_path = PROJECT_ROOT / "datasets" / "processed" / "crime_hurtos_nacional.parquet"
+    if city:
+        city_path = PROJECT_ROOT / "datasets" / "processed" / f"crime_{city.lower()}.parquet"
+        if city_path.exists():
+            return city_path
+    return national_path
+
+
 @router.get("")
 def get_crimes(
     city: Optional[str] = Query(default=None),
@@ -20,18 +29,9 @@ def get_crimes(
     el dataset nacional `crime_hurtos_nacional.parquet` y se aplican filtros por
     departamento/municipio cuando se proporcionen.
     """
-    processed_national = PROJECT_ROOT / "datasets" / "processed" / "crime_hurtos_nacional.parquet"
-    processed_city = None
-    if city:
-        processed_city = PROJECT_ROOT / "datasets" / "processed" / f"crime_{city.lower()}.parquet"
-
-    # Elegir archivo de origen
-    if processed_city and processed_city.exists():
-        path = processed_city
-    elif processed_national.exists():
-        path = processed_national
-    else:
-        return {"items": [], "warning": "Datasets no cargados. Correr refresh."}
+    path = _resolve_dataset_path(city)
+    if not path.exists():
+        return {"city": city or "COLOMBIA", "items": [], "warning": "Datasets no cargados. Correr refresh."}
 
     try:
         df = pd.read_parquet(path)
@@ -62,7 +62,7 @@ def get_crimes(
                 df = df[df["barrio"].str.upper() == city.upper()]
 
         subset = df.head(limit).to_dict(orient="records")
-        return {"source_file": path.name, "total_records": len(df), "limit": limit, "items": subset}
+        return {"city": city or "COLOMBIA", "source_file": path.name, "total_records": len(df), "limit": limit, "items": subset}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 

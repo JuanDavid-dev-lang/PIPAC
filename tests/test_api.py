@@ -17,7 +17,7 @@ def test_meta():
     assert response.status_code == 200
     data = response.json()
     assert "project_root" in data
-    assert data["city"] == "BUCARAMANGA"
+    assert data["scope"] == "COLOMBIA"
 
 
 def test_crimes_endpoint():
@@ -42,6 +42,7 @@ def test_predictions_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert "predictions" in data
+    assert data["city"] == "COLOMBIA"
 
 
 def test_stats_endpoint():
@@ -49,6 +50,7 @@ def test_stats_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert "kpis" in data
+    assert data["city"] == "COLOMBIA"
 
 
 def test_alerts_endpoint():
@@ -56,3 +58,4 @@ def test_alerts_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert "alerts" in data
+    assert data["city"] == "COLOMBIA"

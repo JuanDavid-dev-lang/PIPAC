@@ -4,7 +4,7 @@ Proyecto base en Python 3.12 para analitica predictiva de criminalidad con datos
 
 ## Objetivo
 
-Construir una plataforma que integre:
+Construir una plataforma nacional para Colombia que integre:
 
 - recoleccion automatica de datos.gov.co
 - ETL y homologacion territorial
@@ -36,10 +36,10 @@ Proyecto/
 
 ## Datasets oficiales seleccionados
 
-- [Informacion delictiva del municipio de Bucaramanga](https://www.datos.gov.co/Seguridad-y-Defensa/Informaci-n-delictiva-del-municipio-de-Bucaramanga/x46e-abhz)
+- [Informacion delictiva municipal histórica](https://www.datos.gov.co/Seguridad-y-Defensa/Informaci-n-delictiva-del-municipio-de-Bucaramanga/x46e-abhz)
 - [Reporte Hurto por Modalidades Policia Nacional](https://www.datos.gov.co/Seguridad-y-Defensa/Reporte-Hurto-por-Modalidades-Polic-a-Nacional/d4fr-sbn2)
-- [Accidentes de Transito ocurridos en el Municipio de Bucaramanga](https://www.datos.gov.co/Transporte/3-Accidentes-de-Transito-ocurridos-en-el-Municipio/7cci-nqqb)
-- [Datos de proyeccion de poblacion de Bucaramanga desagregados por barrios y comunas](https://www.datos.gov.co/Vivienda-Ciudad-y-Territorio/Datos-de-proyecci-n-de-poblaci-n-de-Bucaramanga-de/kn95-8dei)
+- [Accidentes de Transito ocurridos en el municipio](https://www.datos.gov.co/Transporte/3-Accidentes-de-Transito-ocurridos-en-el-Municipio/7cci-nqqb)
+- [Datos de proyeccion de poblacion municipal desagregados por barrios y comunas](https://www.datos.gov.co/Vivienda-Ciudad-y-Territorio/Datos-de-proyecci-n-de-poblaci-n-de-Bucaramanga-de/kn95-8dei)
 - [Gran Encuesta Integrada de Hogares - GEIH - 2026](https://www.datos.gov.co/dataset/Gran-Encuesta-Integrada-de-Hogares-GEIH-2026/nzxb-qax7)
 - [Cartografia Urbana Catastral en formato geoDataBase Municipio de Bucaramanga](https://www.datos.gov.co/Vivienda-Ciudad-y-Territorio/23-Cartograf-a-Urbana-Catastral-en-formato-geoData/f4hz-53x5)
 - [Trafico Vehicular ANI](https://www.datos.gov.co/Transporte/Tr-fico-Vehicular-ANI/8yi9-t44c)
@@ -116,8 +116,8 @@ Esto descargará y procesará los datasets definidos en `config/settings.py` y g
 
 ## Notas sobre el dashboard
 
-- El dashboard intenta cargar primero `datasets/processed/crime_hurtos_nacional.parquet`.
-- Si no existe, intenta leer `crime_bga.parquet` o usa una versión simulada.
+- El dashboard intenta cargar primero `datasets/processed/crime_hurtos_nacional_featured.parquet`.
+- Si no existe, intenta leer `crime_hurtos_nacional.parquet`, luego `crime_bga.parquet` o usa una versión simulada.
 - También puede consumir la API local (`/api/v1/crimes`) para datos dinámicos.
 
 
