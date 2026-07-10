@@ -16,6 +16,9 @@ from api.routes.buscador import router as buscador_router
 from api.routes.denuncias import router as denuncias_router
 from preprocessing.etl import run_default_etl
 
+# Módulo Últimas Denuncias Nacionales
+from modules.latest_reports.api.router import router as latest_reports_router
+
 
 app = FastAPI(
     title="Plataforma Inteligente para la Prediccion y Analisis de Criminalidad",
@@ -35,6 +38,7 @@ app.include_router(territorios_router)
 app.include_router(entidades_router)
 app.include_router(buscador_router)
 app.include_router(denuncias_router)
+app.include_router(latest_reports_router)
 
 
 

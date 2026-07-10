@@ -258,6 +258,18 @@ header_buttons = html.Div(
     ],
 )
 
+from modules.latest_reports.dashboard.layout import create_latest_reports_layout
+latest_reports_panel = html.Section(
+    id="latest-reports-seccion",
+    children=[create_latest_reports_layout()]
+)
+
+# Import callbacks manually to register them
+try:
+    import modules.latest_reports.dashboard.callbacks
+except ImportError as e:
+    print(f"Warning: Could not import latest reports callbacks: {e}")
+
 sidebar = html.Aside(
     className="pipac-sidebar",
     children=[
@@ -498,6 +510,7 @@ app.layout = html.Div(
                 kpi_cards,
                 map_panel,
                 charts_row,
+                latest_reports_panel,
                 citizen_panel,
                 reportes_panel,
                 config_panel,
