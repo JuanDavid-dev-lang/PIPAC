@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from config.settings import settings
 from api.routes.health import router as health_router
@@ -40,6 +41,11 @@ app.include_router(buscador_router)
 app.include_router(denuncias_router)
 app.include_router(latest_reports_router)
 
+
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/meta")
