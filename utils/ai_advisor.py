@@ -6,7 +6,30 @@ import numpy as np
 
 class AIAdvisor:
     def __init__(self, featured_df: pd.DataFrame):
-        self.df = featured_df
+        self.df = self._prepare_dataframe(featured_df)
+
+    def _prepare_dataframe(self, featured_df: pd.DataFrame) -> pd.DataFrame:
+        data = featured_df.copy()
+        if data.empty:
+            return data
+        if "barrio" not in data.columns:
+            for column in ("municipio", "comuna", "departamento"):
+                if column in data.columns:
+                    data["barrio"] = data[column]
+                    break
+            else:
+                data["barrio"] = "NACIONAL"
+        if "densidad_eventos_30d" not in data.columns:
+            data["densidad_eventos_30d"] = data.groupby("barrio")["barrio"].transform("count")
+        if "fecha_hora" not in data.columns:
+            data["fecha_hora"] = pd.Timestamp.now()
+        if "hora" not in data.columns:
+            data["hora"] = pd.to_datetime(data["fecha_hora"], errors="coerce").dt.hour.fillna(0).astype(int)
+        if "tipo_delito" not in data.columns:
+            data["tipo_delito"] = "DESCONOCIDO"
+        if "mes" not in data.columns:
+            data["mes"] = pd.to_datetime(data["fecha_hora"], errors="coerce").dt.month.fillna(1).astype(int)
+        return data
 
     def get_highest_risk_zone_tomorrow(self) -> dict:
         """

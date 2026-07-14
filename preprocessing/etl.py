@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
+import unicodedata
 
 import pandas as pd
 
@@ -84,14 +86,19 @@ class CrimeETL:
         data = data.dropna(how="all")
         return data
 
-    def load_local(self, df: pd.DataFrame, dataset_key: str) -> ETLResult:
+    def _safe_dataset_key(self, value: str) -> str:
+        normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+        normalized = re.sub(r"[^a-zA-Z0-9_]+", "_", normalized.lower()).strip("_")
+        return normalized or "sin_nombre"
+
+    def load_local(self, df: pd.DataFrame, dataset_key: str, raw_df: pd.DataFrame | None = None) -> ETLResult:
         raw_path = self.raw_dir / f"{dataset_key}.csv"
         processed_path = self.processed_dir / f"{dataset_key}.parquet"
         
-        # En caso de error, guardamos directo, si no, guardamos raw original y processed transformado
-        if not raw_path.exists() and "error" not in df.columns:
-            # Guardamos un archivo simulado o temporal
-            df.head(100).to_csv(raw_path, index=False)
+        if raw_df is not None:
+            raw_df.to_csv(raw_path, index=False)
+        elif not raw_path.exists() and "error" not in df.columns:
+            df.to_csv(raw_path, index=False)
             
         df.to_parquet(processed_path, index=False)
         return ETLResult(dataset_key, len(df), raw_path, processed_path)
@@ -99,7 +106,7 @@ class CrimeETL:
     def run(self, dataset_key: str) -> ETLResult:
         raw = self.extract(dataset_key)
         processed = self.transform(raw, dataset_key)
-        return self.load_local(processed, dataset_key)
+        return self.load_local(processed, dataset_key, raw_df=raw)
 
     def split_national_by_municipio(self, dataset_key: str = "crime_hurtos_nacional") -> list[ETLResult]:
         """Procesa el dataset nacional y escribe parquet individuales por municipio.
@@ -116,7 +123,7 @@ class CrimeETL:
 
         # Agrupar por municipio y guardar por separado
         for municipio, grp in processed.groupby(processed["municipio"].astype(str)):
-            key_safe = municipio.lower().replace(" ", "_")
+            key_safe = self._safe_dataset_key(municipio)
             fname = f"crime_{key_safe}.parquet"
             processed_path = self.processed_dir / fname
             try:

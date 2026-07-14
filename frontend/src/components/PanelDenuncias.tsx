@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Phone, Globe, ExternalLink, Shield, AlertTriangle,
-  MessageSquare, MapPin, ChevronRight, Loader2
+  MapPin, ChevronRight, Loader2
 } from "lucide-react";
 
 // ─── Canales oficiales de denuncia (datos verificados) ───────────────────────
@@ -72,10 +72,16 @@ type Evento = {
   source: string;
 };
 
+type SocrataEvento = {
+  unidad_policial?: string;
+  ciudad?: string;
+  departamento?: string;
+};
+
 export default function PanelDenuncias() {
   const [tab, setTab] = useState<"denuncias" | "recomendaciones" | "eventos">("eventos");
   const [eventos, setEventos] = useState<Evento[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Tasas de delincuencia nacionales basadas en SIEDCO 2024
   const tasas = [
@@ -91,12 +97,11 @@ export default function PanelDenuncias() {
   // Cargar eventos reales desde datos.gov.co
   useEffect(() => {
     if (tab !== "eventos") return;
-    setLoading(true);
     fetch(
       "https://www.datos.gov.co/resource/k6rh-79ei.json?$limit=8&$order=:id DESC"
     )
       .then((r) => r.json())
-      .then((data: any[]) => {
+      .then((data: SocrataEvento[]) => {
         const mapped: Evento[] = data.map((d, i) => ({
           id: i,
           tipo: d.unidad_policial

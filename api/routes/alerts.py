@@ -5,7 +5,7 @@ from utils.ai_advisor import AIAdvisor
 
 router = APIRouter(prefix="/api/v1/alerts", tags=["alerts"])
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _resolve_dataset_path(city: str | None) -> Path:

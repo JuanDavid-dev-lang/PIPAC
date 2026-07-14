@@ -5,5 +5,11 @@ __pycache__/
 *.parquet
 *.html
 maps/
-notebooks/
+notebooks/.ipynb_checkpoints/
 .pytest_cache/
+data/02_intermediate/*
+data/03_primary/*
+data/04_model_output/*
+!data/02_intermediate/.gitkeep
+!data/03_primary/.gitkeep
+!data/04_model_output/.gitkeep

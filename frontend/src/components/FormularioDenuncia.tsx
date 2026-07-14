@@ -71,11 +71,9 @@ export default function FormularioDenuncia({ onClose, defaultLat, defaultLon, de
       const data = await res.json();
       setRadicado(data.id_denuncia);
       setEnviado(true);
-    } catch (err: any) {
-      // Fallback demo: Si la API no está disponible, simular éxito
-      console.warn("API no disponible, mostrando confirmación demo:", err);
-      setRadicado(Math.floor(Math.random() * 90000) + 10000);
-      setEnviado(true);
+    } catch (err: unknown) {
+      console.error("No fue posible registrar la denuncia:", err);
+      setError("No fue posible guardar el reporte. Verifica la conexión e intenta nuevamente.");
     } finally {
       setLoading(false);
     }

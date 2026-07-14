@@ -4,7 +4,7 @@ from pathlib import Path
 
 router = APIRouter(prefix="/api/v1/stats", tags=["stats"])
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _resolve_dataset_path(city: str | None) -> Path:
@@ -42,8 +42,11 @@ def get_stats(city: str | None = Query(default=None)):
         df = pd.read_parquet(data_path)
         delitos_totales = len(df)
         
-        # Calcular tasa promedio por 1000 de los barrios
-        tasa_promedio = float(df.drop_duplicates(subset=["barrio"])["tasa_crimen_1000"].mean())
+        tasa_promedio = 0.0
+        if "tasa_crimen_1000" in df.columns:
+            territory_col = "barrio" if "barrio" in df.columns else None
+            rate_df = df.drop_duplicates(subset=[territory_col]) if territory_col else df
+            tasa_promedio = float(pd.to_numeric(rate_df["tasa_crimen_1000"], errors="coerce").fillna(0).mean())
         
         # Hotspots activos en DBSCAN (valores diferentes de -1)
         hotspots_activos = 0
@@ -52,7 +55,10 @@ def get_stats(city: str | None = Query(default=None)):
             hotspots_activos = int(df[df["cluster_dbscan"] != -1]["cluster_dbscan"].nunique())
             
         # Riesgo promedio de la ciudad (proporción de registros catalogados como riesgo alto)
-        riesgo_promedio = float(df["es_riesgo_alto"].mean())
+        if "es_riesgo_alto" in df.columns:
+            riesgo_promedio = float(pd.to_numeric(df["es_riesgo_alto"], errors="coerce").fillna(0).mean())
+        else:
+            riesgo_promedio = 0.0
         
         return {
             "city": city or "COLOMBIA",

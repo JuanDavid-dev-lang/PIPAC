@@ -10,6 +10,18 @@ import FormularioDenuncia from "./FormularioDenuncia";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+type LeafletWithHeat = typeof L & {
+  heatLayer: (
+    points: [number, number, number][],
+    options: {
+      radius: number;
+      blur: number;
+      maxZoom: number;
+      gradient: Record<number, string>;
+    }
+  ) => L.Layer;
+};
+
 // ─── Iconos ───────────────────────────────────────────────────────────────────
 const customIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -24,7 +36,7 @@ function HeatmapLayer({ points }: { points: [number, number, number][] }) {
   const map = useMap();
   useEffect(() => {
     if (!map) return;
-    const heatLayer = (L as any).heatLayer(points, {
+    const heatLayer = (L as LeafletWithHeat).heatLayer(points, {
       radius: 25, blur: 15, maxZoom: 10,
       gradient: { 0.4: "blue", 0.6: "cyan", 0.7: "lime", 0.8: "yellow", 1.0: "red" },
     }).addTo(map);
@@ -49,7 +61,6 @@ function DenunciasCercanas({ lat, lon, ciudad }: { lat: number; lon: number; ciu
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
     fetch(`${API}/api/v1/denuncias/cercanas?lat=${lat}&lon=${lon}&radio_km=20&limit=5`)
       .then((r) => r.json())
       .then((data) => setDenuncias(Array.isArray(data) ? data : []))
@@ -61,7 +72,7 @@ function DenunciasCercanas({ lat, lon, ciudad }: { lat: number; lon: number; ciu
         ]);
       })
       .finally(() => setLoading(false));
-  }, [lat, lon]);
+  }, [ciudad, lat, lon]);
 
   const estadoColor: Record<string, string> = {
     RECIBIDA: "text-yellow-400",
@@ -108,6 +119,7 @@ export default function Map() {
   const [mounted, setMounted] = useState(false);
   const [formularioData, setFormularioData] = useState<{ lat: number; lon: number; ciudad: string } | null>(null);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
   if (!mounted) return (

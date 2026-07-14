@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from config.settings import settings
 from api.routes.health import router as health_router
@@ -28,6 +29,19 @@ app = FastAPI(
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8050",
+        "http://127.0.0.1:8050",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(health_router)
 app.include_router(crimes_router)
