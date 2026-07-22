@@ -6,10 +6,11 @@
 
 <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
 <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/>
-<img src="https://img.shields.io/badge/Plotly_Dash-017CEE?style=for-the-badge&logo=plotly&logoColor=white"/>
+<img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white"/>
+<img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"/>
+<img src="https://img.shields.io/badge/XGBoost-EC1C24?style=for-the-badge"/>
 <img src="https://img.shields.io/badge/PostgreSQL-PostGIS-336791?style=for-the-badge&logo=postgresql&logoColor=white"/>
 <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
-<img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"/>
 
 <br/>
 
@@ -29,47 +30,22 @@
 ## 📌 Tabla de Contenidos
 
 - [🎯 Objetivo](#-objetivo)
-- [⚡ Características](#-características)
 - [🏗️ Arquitectura](#️-arquitectura)
+- [🧠 Modelo de Machine Learning](#-modelo-de-machine-learning)
+- [📊 Variables Utilizadas](#-variables-utilizadas)
 - [📁 Estructura del Proyecto](#-estructura-del-proyecto)
 - [🗃️ Datasets Oficiales](#️-datasets-oficiales)
 - [🚀 Instalación](#-instalación-y-ejecución)
 - [🔌 API Endpoints](#-api-endpoints)
-- [🗺️ Visualizaciones](#️-visualizaciones-y-mapas)
 - [🐳 Docker](#-docker)
 - [🧪 Tests](#-tests)
-- [📊 Tecnologías](#-tecnologías)
+- [📊 Stack Tecnológico](#-stack-tecnológico)
 
 ---
 
 ## 🎯 Objetivo
 
-Integrar **datos abiertos** y **machine learning** en una plataforma de escala nacional para predecir, analizar y visualizar patrones de criminalidad en Colombia, en tiempo real.
-
-| Módulo | Descripción |
-|---|---|
-| 📥 Ingesta de Datos | Recolección automática desde datos.gov.co vía API Socrata |
-| 🔧 ETL & Homologación | Limpieza, normalización y homologación territorial municipal |
-| 🧠 Feature Engineering | Ingeniería de características criminológicas avanzadas |
-| 🤖 Modelos de ML | Random Forest, XGBoost, LSTM y más |
-| ⚡ API REST | FastAPI con documentación Swagger/OpenAPI |
-| 🗺️ Dashboard | Mapas Folium + KPIs en tiempo real con Plotly Dash |
-| 🗄️ Base Espacial | PostgreSQL + PostGIS |
-
----
-
-## ⚡ Características
-
-- ✅ Datos oficiales de datos.gov.co
-- ✅ ETL automatizado y escalable
-- ✅ Modelos ML entrenados y versionados
-- ✅ Alertas tempranas de zonas de riesgo
-- ✅ Cobertura nacional Colombia
-- ✅ API REST moderna con Swagger
-- ✅ Mapas geoespaciales interactivos
-- ✅ Dashboard interactivo en tiempo real
-- ✅ Exportación múltiple (csv/json/xlsx)
-- ✅ Totalmente Dockerizado
+Integrar **datos abiertos** y **machine learning supervisado** en una plataforma de escala nacional para predecir, analizar y visualizar patrones de criminalidad en Colombia en tiempo real, identificando zonas de alto riesgo delictivo mediante clasificación binaria y agrupamiento espacial no supervisado.
 
 ---
 
@@ -77,46 +53,118 @@ Integrar **datos abiertos** y **machine learning** en una plataforma de escala n
 
 ```mermaid
 flowchart TD
-    A[🌐 datos.gov.co · API Socrata] --> B[🔧 ETL & Preproceso]
+    A[🌐 datos.gov.co · API Socrata] --> B[🔧 ETL & Feature Engineering]
     B --> C[(🗄️ PostgreSQL + PostGIS)]
-    B --> D[📦 Parquet Datasets]
-    B --> E[🗺️ GeoJSON / Shapefiles]
-    C --> F[🤖 Modelos de ML]
-    D --> F
-    E --> F
-    F --> G[⚡ FastAPI REST]
-    G --> H[📊 Dashboard Plotly Dash]
-    G --> I[🗺️ Mapas Folium]
+    B --> D[📦 Datasets Parquet]
+    D --> E[🧠 Entrenamiento de Modelos ML]
+    E --> F[⚡ FastAPI REST]
+    F --> G[⚛️ Frontend Next.js]
+    E --> H[📍 Clustering DBSCAN - Hotspots]
+    H --> F
 ```
+
+**Backend:** FastAPI (Python 3.12) desplegado en AWS EC2 + Nginx como reverse proxy.
+**Frontend:** Next.js 16 / React 19, desplegado en Vercel.
+**Modelos:** entrenados offline con scikit-learn y XGBoost, serializados en `.joblib` y servidos vía inferencia en tiempo real desde la API.
+
+---
+
+## 🧠 Modelo de Machine Learning
+
+PIPAC aborda el problema como una **tarea de clasificación binaria supervisada**: predecir si una zona/territorio es de **riesgo delictivo alto** (`es_riesgo_alto = 1`) o **no** (`es_riesgo_alto = 0`), en función de la densidad histórica de eventos delictivos.
+
+### Variable objetivo (target)
+
+| Variable | Tipo | Definición |
+|---|---|---|
+| `es_riesgo_alto` | Binaria (0/1) | Se etiqueta como riesgo alto si `densidad_eventos_30d` supera la mediana histórica de la zona |
+
+### Algoritmos entrenados y comparados
+
+Se entrenan y comparan **4 modelos de clasificación** sobre el mismo pipeline de preprocesamiento, seleccionando el de mejor desempeño para servir en producción:
+
+| Modelo | Algoritmo | Librería | Hiperparámetros clave |
+|---|---|---|---|
+| `logistic` | Regresión Logística | scikit-learn | `max_iter=1000`, `class_weight="balanced"` |
+| `dt` | Árbol de Decisión | scikit-learn | `max_depth=10`, `class_weight="balanced"` |
+| `rf` | Random Forest | scikit-learn | `n_estimators=100`, `class_weight="balanced"` |
+| `xgb` | XGBoost Classifier | XGBoost | `n_estimators=100`, `max_depth=5`, `learning_rate=0.05`, `subsample=0.8`, `colsample_bytree=0.8` |
+
+Todos usan `random_state=42` para reproducibilidad y balanceo de clases (`class_weight="balanced"`) para compensar el desbalance entre zonas de riesgo alto/bajo.
+
+### Pipeline de preprocesamiento (`ColumnTransformer`)
+
+- **Variables numéricas:** imputación por mediana (`SimpleImputer(strategy="median")`)
+- **Variables categóricas:** imputación por moda + codificación one-hot (`OneHotEncoder(handle_unknown="ignore")`)
+- **División de datos:** `train_test_split` 80/20, estratificado por la variable objetivo (`stratify=y`)
+
+### Métricas de evaluación
+
+Cada modelo se evalúa con: `accuracy`, `precision`, `recall`, `f1-score`, `ROC-AUC` y matriz de confusión completa (TN, FP, FN, TP), almacenadas en `models/{modelo}.metrics.json`.
+
+> ⚠️ **Nota técnica:** en el entrenamiento actual todos los modelos alcanzan métricas perfectas (1.0 en las 5 métricas). Esto es indicio de **fuga de datos (data leakage)**, ya que la variable objetivo se deriva directamente de `densidad_eventos_30d`, la cual también se usa como variable predictora. Antes de usar estas métricas como evidencia de desempeño real (por ejemplo en un sustentación o demo formal), se recomienda excluir `densidad_eventos_30d` del conjunto de variables predictoras o redefinir el target a partir de una variable independiente.
+
+### Modelo no supervisado adicional: detección de hotspots
+
+Además de la clasificación, se usa **DBSCAN** (`sklearn.cluster`) para agrupar geográficamente eventos delictivos y detectar zonas calientes ("hotspots"):
+
+- `eps_km = 1.5` (radio a escala nacional) / `0.5` (escala municipal)
+- `min_samples = 10`
+- Artefacto serializado: `models/dbscan_hotspots.joblib`
+
+---
+
+## 📊 Variables Utilizadas
+
+El modelo utiliza **11 variables predictoras** (7 categóricas + 4 numéricas), seleccionadas dinámicamente según disponibilidad en el dataset:
+
+### Variables categóricas (7) — codificadas con One-Hot Encoding
+
+| # | Variable | Descripción |
+|---|---|---|
+| 1 | `tipo_delito` | Categoría del delito reportado |
+| 2 | `barrio` | Barrio o unidad territorial de menor escala |
+| 3 | `comuna` | Comuna/municipio o departamento |
+| 4 | `zona_tipo` | Clasificación de zona (residencial, comercial, etc.) |
+| 5 | `mes` | Mes del evento (1-12) |
+| 6 | `dia_semana` | Día de la semana (0-6) |
+| 7 | `hora` | Hora del día del evento (0-23) |
+
+### Variables numéricas (4) — imputadas con la mediana
+
+| # | Variable | Descripción |
+|---|---|---|
+| 8 | `densidad_eventos_30d` | Suma de eventos delictivos en ventana móvil de 30 días por barrio |
+| 9 | `tasa_crimen_1000` | Tasa de criminalidad por cada 1,000 habitantes |
+| 10 | `poblacion_total` | Población total del territorio (cruce con datos DANE/proyección poblacional) |
+| 11 | `movilidad_intensidad` | Proxy de movilidad, calculado como conteo de accidentes de tránsito por zona |
+
+### Variables temporales adicionales generadas en el ETL (no todas usadas como predictoras directas)
+
+`anio`, `dia`, `semana_anio`, `es_fin_de_semana` — generadas en `preprocessing/features.py::build_temporal_features` para análisis exploratorio y dashboards, aunque no todas entran al pipeline de entrenamiento actual.
 
 ---
 
 ## 📁 Estructura del Proyecto
-
-```
 PIPAC/
-├── api/                 → FastAPI: endpoints REST
-├── dashboard/           → Plotly Dash: visualización interactiva
-├── preprocessing/       → ETL: limpieza y transformación
-├── training/            → Entrenamiento de modelos ML
-├── models/               → Modelos serializados (.pkl, .joblib)
-├── datasets/
-│   ├── raw/
-│   └── processed/
-├── maps/                 → Mapas Folium y GeoJSON
-├── notebooks/             → Análisis exploratorio Jupyter
-├── config/                → Configuración y settings
-├── utils/                  → Utilidades compartidas
-├── scripts/                 → Scripts de migración y admin
-├── tests/                    → Suite de pruebas
-├── documentation/              → Documentación técnica
-├── Dockerfile.api
-├── Dockerfile.dashboard
+├── api/ → FastAPI: endpoints REST (main.py, routes/)
+├── frontend/ → Next.js 16 + React 19 (desplegado en Vercel)
+├── preprocessing/ → ETL: limpieza, features, homologación territorial
+├── training/ → Entrenamiento de modelos (train.py, hotspots.py)
+├── src/ → Módulos auxiliares de pipeline e integración ML
+├── models/ → Modelos serializados (.joblib) + métricas (.json)
+├── modules/latest_reports/ → Módulo de últimas denuncias nacionales
+├── database/ → Esquema SQL (schema.sql)
+├── datasets/ → raw/, processed/
+├── notebooks/ → Análisis exploratorio Jupyter (EDA, limpieza, modelo, reportes)
+├── scripts/ → Migración PostGIS, ETL nacional
+├── tests/ → Suite de pruebas (API, inferencia, calidad de datos, smoke)
+├── config/ → Configuración y settings (settings.py)
+├── Dockerfile.api / Dockerfile.dashboard
 ├── docker-compose.yml
 ├── .env.example
 ├── requirements.txt
 └── README.md
-```
 
 ---
 
@@ -138,41 +186,26 @@ PIPAC/
 
 ## 🚀 Instalación y Ejecución
 
-**Prerequisitos:** Python 3.12+, PostgreSQL 14+ con PostGIS (opcional), Docker & Docker Compose.
-
-### ⚡ Inicio rápido (Windows)
-```batch
-iniciar.bat
-```
-
-### 🐍 Manual
-
 ```bash
 # 1. Clonar
 git clone https://github.com/JuanDavid-dev-lang/PIPAC.git
 cd PIPAC
 
 # 2. Entorno virtual
-python -m venv .venv
-.venv\Scripts\activate      # Windows
-source .venv/bin/activate   # Linux/macOS
+python -m venv venv
+source venv/bin/activate   # Linux/macOS
+venv\Scripts\activate      # Windows
 pip install -r requirements.txt
 
 # 3. Variables de entorno
-copy .env.example .env      # Windows
-cp .env.example .env        # Linux/macOS
+cp .env.example .env
 
 # 4. Levantar API
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-# → http://127.0.0.1:8000  |  Docs: /docs
+# → http://127.0.0.1:8000/docs
 
-# 5. Levantar Dashboard
-python -m dashboard.app
-# → http://127.0.0.1:8050
-
-# 6. Generar mapas
-python -m maps.generate_maps
-# → maps/output/
+# 5. Entrenar modelos (opcional, ya vienen pre-entrenados en /models)
+python -m training.train
 ```
 
 ---
@@ -183,58 +216,23 @@ python -m maps.generate_maps
 |---|---|---|
 | `GET` | `/health` | Estado del sistema |
 | `GET` | `/api/v1/crimes` | Datos de criminalidad |
-| `GET` | `/api/v1/predictions` | Predicciones de ML |
+| `GET` | `/api/v1/predictions` | Predicciones de riesgo por territorio |
+| `GET` | `/api/v1/predictions/risk-map` | Mapa de riesgo (Heatmap GeoJSON) |
+| `GET` | `/api/v1/predictions/alerts` | Alertas predictivas generadas por IA |
+| `GET` | `/api/v1/predictions/trend` | Proyección de tendencias por ML |
 | `GET` | `/api/v1/stats` | Estadísticas agregadas |
 | `GET` | `/api/v1/alerts` | Alertas activas |
-| `POST` | `/api/v1/datasets/refresh` | Refrescar datasets |
-| `POST` | `/api/v1/train` | Entrenar modelos |
-| `GET` | `/api/v1/export/{format}` | Exportar datos (csv/json/xlsx) |
+| `POST` | `/api/v1/datasets/refresh/local` | Refrescar datasets localmente |
 
-> 📖 Documentación interactiva en `/docs` (Swagger UI) y `/redoc`
-
----
-
-## 🗺️ Visualizaciones y Mapas
-
-- 🔴 Heatmaps de criminalidad por municipio y departamento
-- 📍 Puntos de incidentes geolocalizados
-- 🔵 Zonas de alto riesgo predichas por ML
-- 📈 KPIs en tiempo real: tasa delictiva, variación mensual, hotspots
-- 🗺️ Capas GeoJSON con división político-administrativa de Colombia
+> 📖 Documentación interactiva en `/docs` (Swagger UI)
 
 ---
 
 ## 🐳 Docker
 
 ```bash
-docker-compose up --build      # Todos los servicios
-docker-compose up api          # Solo API
-docker-compose up dashboard    # Solo dashboard
+docker-compose up --build
 ```
-
-| Servicio | Puerto | URL |
-|---|---|---|
-| API FastAPI | `8000` | http://localhost:8000/docs |
-| Dashboard | `8050` | http://localhost:8050 |
-| PostgreSQL | `5432` | localhost:5432 |
-
----
-
-## 🗄️ Migraciones PostGIS
-
-```bash
-pip install psycopg2-binary
-python scripts/migrate_postgis.py
-```
-
----
-
-## 📥 Ejecutar ETL
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/v1/datasets/refresh/local
-```
-> Los datasets se guardan en `datasets/processed/` como `.parquet`
 
 ---
 
@@ -242,46 +240,29 @@ curl -X POST http://127.0.0.1:8000/api/v1/datasets/refresh/local
 
 ```bash
 pytest tests/ -v
-pytest tests/ --cov=api --cov-report=html
 ```
 
 ---
 
-## 📊 Tecnologías
+## 📊 Stack Tecnológico
 
 | Capa | Tecnología |
 |---|---|
 | Lenguaje | Python 3.12 |
 | API | FastAPI + Uvicorn |
-| Dashboard | Plotly Dash |
-| ML | scikit-learn, XGBoost, statsmodels |
-| Mapas | Folium, GeoPandas |
+| Frontend | Next.js 16, React 19, Tailwind CSS |
+| ML — Clasificación | Logistic Regression, Decision Tree, Random Forest, XGBoost (scikit-learn / xgboost) |
+| ML — Clustering | DBSCAN (scikit-learn) |
 | Base de Datos | PostgreSQL + PostGIS |
-| Datos | Pandas, Polars, PyArrow (Parquet) |
+| Datos | Pandas, PyArrow (Parquet) |
 | Contenedores | Docker + Docker Compose |
 | Datos Abiertos | Socrata API (datos.gov.co) |
-
----
-
-## 📝 Notas del Dashboard
-
-Orden de carga de datos:
-1. `datasets/processed/crime_hurtos_nacional_featured.parquet`
-2. `datasets/processed/crime_hurtos_nacional.parquet`
-3. `datasets/processed/crime_bga.parquet`
-4. API local → `/api/v1/crimes`
-5. Datos de demostración simulados (fallback)
 
 ---
 
 <div align="center">
 
 ### 🇨🇴 Hecho con ❤️ para Colombia
-*Contribuyendo a la seguridad ciudadana mediante tecnología e inteligencia artificial*
-
-<img src="https://img.shields.io/badge/Made_with-Python-3776AB?style=for-the-badge"/>
-<img src="https://img.shields.io/badge/For-Colombia-FCD116?style=for-the-badge"/>
-<img src="https://img.shields.io/badge/Powered_by-Open_Data-00D4FF?style=for-the-badge"/>
 
 ⭐ **¡Dale una estrella si te sirve!** ⭐
 
