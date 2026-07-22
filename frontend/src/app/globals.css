@@ -20,7 +20,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 /* Utilities for glassmorphism */
@@ -69,4 +68,30 @@ body {
   background-color: rgba(37, 99, 235, 0.9) !important;
   color: white !important;
   font-weight: bold;
+}
+
+/* ── Responsive utilities ─────────────────────────────────────────────────── */
+
+/* Horizontal scroll for wide content on mobile */
+.overflow-x-scroll-touch {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.4) transparent;
+}
+
+/* Mobile hamburger drawer animation */
+.mobile-drawer {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure minimum touch target sizes */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }

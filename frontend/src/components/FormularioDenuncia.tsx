@@ -88,7 +88,7 @@ export default function FormularioDenuncia({ onClose, defaultLat, defaultLon, de
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg glass-panel rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-lg glass-panel rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-h-[95vh] sm:max-h-[90vh] flex flex-col">
         
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10 flex-shrink-0">
@@ -184,7 +184,7 @@ export default function FormularioDenuncia({ onClose, defaultLat, defaultLon, de
                 <label className="block text-[11px] text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> Ubicación *
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="text"
                     value={form.ciudad}
@@ -253,7 +253,7 @@ export default function FormularioDenuncia({ onClose, defaultLat, defaultLon, de
 
               {/* Datos de contacto (si no es anónima) */}
               {!form.es_anonima && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
                     <input

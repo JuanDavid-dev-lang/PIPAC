@@ -151,7 +151,7 @@ export default function PanelDenuncias() {
         ))}
       </div>
 
-      <div className="p-3 max-h-80 overflow-y-auto">
+      <div className="p-3 max-h-64 md:max-h-80 overflow-y-auto">
 
         {/* ── TAB: EVENTOS ─────────────────────────────────────────── */}
         {tab === "eventos" && (
