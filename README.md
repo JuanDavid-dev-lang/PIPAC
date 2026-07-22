@@ -144,29 +144,29 @@ El modelo utiliza **11 variables predictoras** (7 categóricas + 4 numéricas), 
 `anio`, `dia`, `semana_anio`, `es_fin_de_semana` — generadas en `preprocessing/features.py::build_temporal_features` para análisis exploratorio y dashboards, aunque no todas entran al pipeline de entrenamiento actual.
 
 ---
-
 ## 📁 Estructura del Proyecto
+
+```
 PIPAC/
-├── api/ → FastAPI: endpoints REST (main.py, routes/)
-├── frontend/ → Next.js 16 + React 19 (desplegado en Vercel)
-├── preprocessing/ → ETL: limpieza, features, homologación territorial
-├── training/ → Entrenamiento de modelos (train.py, hotspots.py)
-├── src/ → Módulos auxiliares de pipeline e integración ML
-├── models/ → Modelos serializados (.joblib) + métricas (.json)
+├── api/                    → FastAPI: endpoints REST (main.py, routes/)
+├── frontend/               → Next.js 16 + React 19 (desplegado en Vercel)
+├── preprocessing/          → ETL: limpieza, features, homologación territorial
+├── training/               → Entrenamiento de modelos (train.py, hotspots.py)
+├── src/                    → Módulos auxiliares de pipeline e integración ML
+├── models/                 → Modelos serializados (.joblib) + métricas (.json)
 ├── modules/latest_reports/ → Módulo de últimas denuncias nacionales
-├── database/ → Esquema SQL (schema.sql)
-├── datasets/ → raw/, processed/
-├── notebooks/ → Análisis exploratorio Jupyter (EDA, limpieza, modelo, reportes)
-├── scripts/ → Migración PostGIS, ETL nacional
-├── tests/ → Suite de pruebas (API, inferencia, calidad de datos, smoke)
-├── config/ → Configuración y settings (settings.py)
+├── database/               → Esquema SQL (schema.sql)
+├── datasets/                → raw/, processed/
+├── notebooks/                 → Análisis exploratorio Jupyter (EDA, limpieza, modelo, reportes)
+├── scripts/                    → Migración PostGIS, ETL nacional
+├── tests/                        → Suite de pruebas (API, inferencia, calidad de datos, smoke)
+├── config/                         → Configuración y settings (settings.py)
 ├── Dockerfile.api / Dockerfile.dashboard
 ├── docker-compose.yml
 ├── .env.example
 ├── requirements.txt
 └── README.md
-
----
+```
 
 ## 🗃️ Datasets Oficiales
 
